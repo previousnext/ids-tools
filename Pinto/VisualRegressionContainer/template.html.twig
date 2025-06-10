@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pinto Ace</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB4PSI0IiB5PSI0IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHJ4PSI0IiByeT0iNCIgZmlsbD0iIzIyOEIyMiIvPgogIDx0ZXh0IHg9IjE2IiB5PSIxOSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEwIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2Y1ZjVmNSI+QUNFPC90ZXh0Pgo8L3N2Zz4=">
+  {% for c in css %}
+    <link rel="stylesheet" media="all" href="{{ c.href }}" {{ c.attributes | raw }}>
+  {% endfor %}
+
+  {% for j in js %}
+    <script src="{{ j.src }}" {{ j.attributes | raw }}></script>
+  {% endfor %}
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #222;
+      background-image: linear-gradient(0deg, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(0deg, rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 40px 40px, 40px 40px, 8px 8px, 8px 8px;
+      background-position: center top;
+      font-size: 16px;
+    }
+    .pinto-debug {
+      font-family: monospace;
+      font-size: 0.75em;
+      background-color: #000;
+      color: #fff;
+      height: 40px;
+      column-gap: 3em;
+      padding: 0 3em;
+      display: flex;
+      align-items: center;
+    }
+    .pinto-debug a {
+      color: #fff;
+    }
+    .pinto-debug a:hover {
+      color: #ddd;
+    }
+    .pinto-debug > div {
+    }
+    .pinto-debug > div > * {
+    }
+    .pinto-ace-outer {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, 40px);
+      margin: 0 auto;
+      justify-content: center;
+    }
+    .pinto-ace {
+      /* this is just like `width`, but make it span to 15*40 so it sits inside the blueprint grid in body */
+      grid-column: span 15;
+      margin: 40px 0;
+      padding: 40px;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="pinto-debug">
+    <!-- Only show things by default if they do not change -->
+    <!-- Things that could change commonly, like render array dump/collected libraries, should be collapsed so they dont interfere with regression testing. -->
+    <div><a href="{{ enumHref }}">{{ enum }}</a></div>
+    <div><a href="{{ objectClassHref }}">{{ objectClass }}</a></div>
+    <div><a href="{{ scenarioHref }}">{{ scenario }}</a>{% if subScenario is not empty %} &rArr; {{ subScenario }}{% endif %}</div>
+  </div>
+  <div class="pinto-ace-outer" style="{% if viewPortWidth is not empty %}width: {{ viewPortWidth }}px; {% endif %}{% if viewPortHeight is not empty %}height: {{ viewPortHeight }}px; {% endif %}">
+    <div class="pinto-ace" style="{% if viewPortWidth is not empty %}grid-column: span {{ viewPortWidth // 40 }} {% endif %}">
+      <div id="pinto-ace-screenshot-area">{{ inner }}</div>
+    </div>
+  </div>
+</body>
+</html>

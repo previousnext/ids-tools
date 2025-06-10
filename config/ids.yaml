@@ -1,0 +1,26 @@
+# A task ticket exists to make this configuration system better.
+parameters:
+  # Change this in root .env:
+  ids.design_system: '%env(DESIGN_SYSTEM)%'
+  ids.design_system.additional: ['commonds']
+  # Defines all design systems. Only those in above two parameters are added to discovery.
+  ids.design_systems:
+    # Keyed by potential values of `ids.design_system`.
+    # Values are arrays of class-string references of the Pinto Lists in the DS.
+    commonds: !php/const PreviousNext\Ds\Common\List\CommonLists::Lists
+    mixtape: !php/const PreviousNext\Ds\Mixtape\List\MixtapeLists::Lists
+    nswds: !php/const PreviousNext\Ds\Nsw\Lists\NswLists::Lists
+
+  ids.project_dir: '%env(PROJECT_DIR)%'
+  ids.ide: 'phpstorm'
+
+  ids.build_objects:
+    # File path relative to the Pinto Object class itself.
+    directory: '/Tests/fixtures/snapshots'
+
+# @todo other env vars and params, needed for command to work on host.
+#base url: http://http/ #(host varyable)
+#webdriver url: http://firefox:4444/wd/hub #(host varyable)
+#twig debug cache dir: /data/app/cache/twig #(host varyable). manual or allow ~ to use phptempdir/ids/twig/
+#dump location for html: output/html/
+#dump location for screenshots: output/screenshots/

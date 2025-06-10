@@ -1,0 +1,68 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Composer\Autoload\ClassLoader;
+use PreviousNext\Ds\Common\Component\Card\Tests\CardTest;
+use PreviousNext\IdsTools\Command;
+use PreviousNext\IdsTools\DependencyInjection\IdsContainer;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Config\FileLocator;
+
+// We have the luxury of using this global.
+# https://getcomposer.org/doc/articles/vendor-binaries.md#finding-the-composer-autoloader-from-a-binary
+require_once dirname($GLOBALS['_composer_autoload_path']) . '/autoload_runtime.php';
+
+return static function (array $context): Application {
+    $loaders = ClassLoader::getRegisteredLoaders();
+    $loader = reset($loaders);
+
+    $drupalPintoDependencies = [
+      'pinto',
+      'pinto_block',
+    ];
+    foreach ($drupalPintoDependencies as $drupalPintoDependency) {
+      // For now, rely on the dependencies being put in places via composer libraries. But we should really be
+      // installing a completely unique set of deps in packages/ instead.
+      $loader->addPsr4(\sprintf('Drupal\%s\\', $drupalPintoDependency), sprintf('%s/../../../app/modules/contrib/%s/src', __DIR__, $drupalPintoDependency));
+    }
+
+    $app = new Application('ids', '0.0.1');
+
+    $container = new ContainerBuilder();
+
+    $fileLocator = new FileLocator([\getcwd() . '/.ids-config', __DIR__ . '/../config']);
+    $loader = new YamlFileLoader($container, $fileLocator);
+    $loader->load('ids.yaml');
+
+    $lazyCommandMap = [];
+    $lazyCommandRefs = [];
+    foreach ([
+      'dump' => Command\DumpAll::class,
+      'dump:html' => Command\DumpHtml::class,
+      'dump:build-objects' => Command\DumpBuildObjectSnapshots::class,
+    ] as $name => $class) {
+        $container->register($class, $class)
+          ->setAutowired(TRUE);
+        $lazyCommandMap[$name] = $class;
+        $lazyCommandRefs[$class] = new Reference($class);
+    }
+
+    $container
+        ->register('console.command_loader', ContainerCommandLoader::class)
+        ->setPublic(true)
+        ->setArguments([ServiceLocatorTagPass::register($container, $lazyCommandRefs), $lazyCommandMap]);
+
+    IdsContainer::setupContainer($container);
+    $container->compile(resolveEnvPlaceholders: TRUE);
+
+    $app->setCommandLoader($container->get('console.command_loader'));
+
+    return $app;
+};

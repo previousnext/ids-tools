@@ -1,0 +1,28 @@
+{
+    "name": "previousnext/ids-tools",
+    "type": "library",
+    "version": "0.0.1",
+    "require": {
+        "php": ">=8.2",
+        "php-webdriver/webdriver": "^1.15",
+        "symfony/config": "^7.2",
+        "symfony/console": "^7.2",
+        "symfony/dependency-injection": "^7.2",
+        "symfony/dotenv": "^7.2",
+        "symfony/property-access": "^7.2",
+        "symfony/runtime": "^7.2",
+        "symfony/serializer": "^7.2",
+        "symfony/stopwatch": "^7.2",
+        "thecodingmachine/safe": "^3.3",
+        "twig/twig": "^3.21"
+    },
+    "autoload": {
+        "psr-4": {
+            "PreviousNext\\IdsTools\\": "."
+        }
+    },
+    "license": "proprietary",
+    "bin": [
+        "bin/ids"
+    ]
+}
