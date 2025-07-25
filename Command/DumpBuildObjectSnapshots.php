@@ -7,6 +7,7 @@ namespace PreviousNext\IdsTools\Command;
 use Pinto\Attribute\Definition;
 use Pinto\PintoMapping;
 use PreviousNext\Ds\Common\Vo\Id\Id;
+use PreviousNext\IdsTools\DependencyInjection\IdsCompilerPass;
 use PreviousNext\IdsTools\Scenario\CompiledScenario;
 use PreviousNext\IdsTools\Scenario\Scenarios;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -38,11 +39,14 @@ final class DumpBuildObjectSnapshots extends Command {
 
   /**
    * @phpstan-param array{directory: string} $buildObjectConfiguration
+   * @phpstan-param array<class-string<\Pinto\List\ObjectListInterface>> $primaryLists
    */
   public function __construct(
     private PintoMapping $pintoMapping,
     #[Autowire(param: 'ids.build_objects')]
     private array $buildObjectConfiguration,
+    #[Autowire('%' . IdsCompilerPass::PRIMARY_LISTS . '%')]
+    private array $primaryLists,
   ) {
     $this->stopwatch = new Stopwatch();
     $this->serializer = static::serializerSetup();
@@ -60,7 +64,7 @@ final class DumpBuildObjectSnapshots extends Command {
     // Get the Objects and their Scenarios.
     /** @var array<array{\PreviousNext\IdsTools\Scenario\CompiledScenario, callable, class-string}> $scenarios */
     $scenarios = [];
-    foreach (Scenarios::findScenarios($this->pintoMapping) as $scenario => $scenarioObject) {
+    foreach (Scenarios::findScenarios($this->pintoMapping, $this->primaryLists) as $scenario => $scenarioObject) {
       $this->stopwatch->lap('object generation');
       $pintoEnum = $scenario->pintoEnum ?? throw new \LogicException();
       $definition = ((new \ReflectionEnumUnitCase($pintoEnum::class, $pintoEnum->name))->getAttributes(Definition::class)[0] ?? NULL)?->newInstance() ?? throw new \LogicException('Missing ' . Definition::class);

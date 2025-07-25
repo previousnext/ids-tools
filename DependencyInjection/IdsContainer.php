@@ -8,8 +8,10 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\pinto\PintoCompilerPass;
 use Drupal\pinto\PintoMappingFactory;
 use Pinto\PintoMapping;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -29,6 +31,38 @@ final class IdsContainer {
     $container->addCompilerPass(new IdsCompilerPass());
     $container->addCompilerPass(new PintoCompilerPass());
     \Drupal::setContainer($container);
+  }
+
+  /**
+   * @phpstan-return \Generator<ContainerInterface>
+   */
+  public static function testContainers(): \Generator {
+    $baseContainer = new ContainerBuilder();
+
+    $fileLocator = new FileLocator([__DIR__ . '/../config']);
+    $loader = new YamlFileLoader($baseContainer, $fileLocator);
+    $loader->load('ids.yaml');
+
+    /** @var array<string, array{ds: array<class-string<\Pinto\List\ObjectListInterface>>, additional?: array<array<class-string<\Pinto\List\ObjectListInterface>>>}> $dsList */
+    $dsList = $baseContainer->getParameter('ids.design_systems');
+    foreach (\array_keys($dsList) as $ds) {
+      yield $ds => static::testContainerForDs($ds);
+    }
+  }
+
+  public static function testContainerForDs(string $ds): ContainerInterface {
+    $container = new ContainerBuilder();
+
+    $fileLocator = new FileLocator([__DIR__ . '/../config']);
+    $loader = new YamlFileLoader($container, $fileLocator);
+    $loader->load('ids.yaml');
+
+    /** @var 'mixtape'|'nswds' $ds */
+    $container->setParameter('ids.design_system', $ds);
+
+    IdsContainer::setupContainer($container);
+    $container->compile();
+    return $container;
   }
 
 }

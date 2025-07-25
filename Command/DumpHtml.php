@@ -16,6 +16,7 @@ use PreviousNext\Ds\Common\List as CommonLists;
 use PreviousNext\Ds\Common\Utility\Twig as CommonTwig;
 use PreviousNext\Ds\Mixtape\Utility\Twig as MixtapeTwig;
 use PreviousNext\Ds\Nsw\Utility\Twig as NswTwig;
+use PreviousNext\IdsTools\DependencyInjection\IdsCompilerPass;
 use PreviousNext\IdsTools\Pinto\VisualRegressionContainer\VisualRegressionContainer;
 use PreviousNext\IdsTools\Rendering\DrupalRenderBox;
 use PreviousNext\IdsTools\Scenario\CompiledScenario;
@@ -59,6 +60,9 @@ final class DumpHtml extends Command {
 
   private ?RemoteWebDriver $driver = NULL;
 
+  /**
+   * @phpstan-param array<class-string<\Pinto\List\ObjectListInterface>> $primaryLists
+   */
   public function __construct(
     private PintoMapping $pintoMapping,
     #[Autowire('%pinto.internal.hook_theme%')]
@@ -67,6 +71,8 @@ final class DumpHtml extends Command {
     string $ide,
     #[Autowire('%ids.project_dir%')]
     private string $projectDir,
+    #[Autowire('%' . IdsCompilerPass::PRIMARY_LISTS . '%')]
+    private array $primaryLists,
     private Stopwatch $stopwatch = new Stopwatch(),
   ) {
     /** @var array<string, array{path: string, template: string, variables: array<string, mixed>}> $hookThemeDefinitions */
@@ -96,7 +102,7 @@ final class DumpHtml extends Command {
     // generated and timed.
     /** @var \SplObjectStorage<\PreviousNext\IdsTools\Scenario\CompiledScenario, object&callable> $scenarios */
     $scenarios = new \SplObjectStorage();
-    foreach (Scenarios::findScenarios($this->pintoMapping) as $scenario => $scenarioObject) {
+    foreach (Scenarios::findScenarios($this->pintoMapping, $this->primaryLists) as $scenario => $scenarioObject) {
       $this->stopwatch->lap('object generation');
       $scenarios[$scenario] = $scenarioObject;
     }
@@ -122,7 +128,7 @@ final class DumpHtml extends Command {
     // Twig namespaces:
     // @todo fix hardcoding NSW (TODO#0011).
     $nswTwigDir = \Safe\realpath(\DRUPAL_ROOT . '/' . CommonTwig::computePathFromDrupalRootTo(
-      \Safe\realpath(\sprintf('%s/../components/design-system/', \DRUPAL_ROOT)),
+      \Safe\realpath(\sprintf('%s/../components/design-system/nswds/', \DRUPAL_ROOT)),
     ));
     $loader = new FilesystemLoader();
     $loader->addPath($nswTwigDir, namespace: NswTwig::NAMESPACE);
@@ -135,7 +141,7 @@ final class DumpHtml extends Command {
         \realpath(\dirname($commonFileName) . '/..'),
       ), namespace: CommonTwig::NAMESPACE);
     $loader->addPath(\Safe\realpath(\DRUPAL_ROOT . '/' . CommonTwig::computePathFromDrupalRootTo(
-      \Safe\realpath(\sprintf('%s/../components/design-system/', \DRUPAL_ROOT)),
+      \Safe\realpath(\sprintf('%s/../components/design-system/mixtape/', \DRUPAL_ROOT)),
     )), namespace: MixtapeTwig::NAMESPACE);
     $this->stopwatch->stop('twig');
 

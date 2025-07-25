@@ -4,7 +4,6 @@
 declare(strict_types=1);
 
 use Composer\Autoload\ClassLoader;
-use PreviousNext\Ds\Common\Component\Card\Tests\CardTest;
 use PreviousNext\IdsTools\Command;
 use PreviousNext\IdsTools\DependencyInjection\IdsContainer;
 use Symfony\Component\Console\Application;

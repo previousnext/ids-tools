@@ -33,12 +33,12 @@ final class Scenarios {
   }
 
   /**
+   * @phpstan-param array<class-string<\Pinto\List\ObjectListInterface>> $filterByEnumClasses
    * @phpstan-return \Generator<\PreviousNext\IdsTools\Scenario\CompiledScenario, callable&object>
    */
-  public static function findScenarios(PintoMapping $pintoMapping): \Generator {
+  public static function findScenarios(PintoMapping $pintoMapping, array $filterByEnumClasses = []): \Generator {
     foreach ($pintoMapping->getEnumClasses() as $enumClass) {
-      if (\str_contains($enumClass, 'Nsw')) {
-        // @todo fix this right now only nsw can be rendered. (TODO#0010)
+      if ($filterByEnumClasses !== [] && !\in_array($enumClass, $filterByEnumClasses, TRUE)) {
         continue;
       }
 
