@@ -117,7 +117,7 @@ final class Scenarios {
           yieldKey: $k,
         );
         // $k can be customised in the scenario generator by using syntax:
-        // `yield 'SCENARIONAME' => $object;`c
+        // `yield 'SCENARIONAME' => $object;`
         yield $newScenario => $r;
         // Yield $compiledScenario->id => [$r, $compiledScenario];.
       }

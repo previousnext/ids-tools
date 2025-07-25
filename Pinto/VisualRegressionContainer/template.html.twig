@@ -19,6 +19,7 @@
       background-image: linear-gradient(0deg, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(0deg, rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
       background-size: 40px 40px, 40px 40px, 8px 8px, 8px 8px;
       background-position: center top;
+      background-repeat: repeat;
       font-size: 16px;
     }
     .pinto-debug {
@@ -28,7 +29,7 @@
       color: #fff;
       height: 40px;
       column-gap: 3em;
-      padding: 0 3em;
+      padding: 0 3em 0 0;
       display: flex;
       align-items: center;
     }
@@ -55,15 +56,56 @@
       padding: 40px;
       background: #fff;
     }
+    .pinto-nav {
+      display: flex;
+      width: 80px;
+    }
+    .pinto-nav--previous, .pinto-nav--next {
+      display: inline-block;
+      aspect-ratio: 1 / 1;
+      text-overflow: clip;
+      width: 40px;
+      position: relative;
+    }
+    a.pinto-nav--previous:hover, a.pinto-nav--next:hover {
+      background-color: #e1d8f3;
+    }
+    .pinto-nav--previous svg, .pinto-nav--next svg {
+      position: absolute;
+      inset: 10px;
+      color: mediumpurple;
+      fill: currentColor;
+    }
   </style>
 </head>
 <body>
   <div class="pinto-debug">
+    <nav class="pinto-nav">
+      {# Icons https://heroicons.com/ #}
+      {% if previousHref is not empty%}
+      <a href="{{ previousHref }}" class="pinto-nav--previous">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" fill="currentColor" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+        </svg>
+      </a>
+      {% else %}
+      <span class="pinto-nav--previous"></span>
+      {% endif %}
+      {% if nextHref is not empty %}
+      <a href="{{ nextHref }}" class="pinto-nav--next">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" fill="currentColor" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+        </svg>
+      </a>
+      {% else %}
+      <span class="pinto-nav--next"></span>
+      {% endif %}
+    </nav>
     <!-- Only show things by default if they do not change -->
     <!-- Things that could change commonly, like render array dump/collected libraries, should be collapsed so they dont interfere with regression testing. -->
-    <div><a href="{{ enumHref }}">{{ enum }}</a></div>
-    <div><a href="{{ objectClassHref }}">{{ objectClass }}</a></div>
-    <div><a href="{{ scenarioHref }}">{{ scenario }}</a>{% if subScenario is not empty %} &rArr; {{ subScenario }}{% endif %}</div>
+    <div>{% if enumHref is not empty %}<a href="{{ enumHref }}">{{ enum }}</a>{% else %}{{ enum }}{% endif %}</div>
+    <div>{% if objectClassHref is not empty %}<a href="{{ objectClassHref }}">{{ objectClass }}</a>{% else %}{{ objectClass }}{% endif %}</div>
+    <div>{% if scenarioHref is not empty %}<a href="{{ scenarioHref }}">{{ scenario }}</a>{% else %}{{ scenario }}{% endif %}{% if subScenario is not empty %} &rArr; {{ subScenario }}{% endif %}</div>
   </div>
   <div class="pinto-ace-outer" style="{% if viewPortWidth is not empty %}width: {{ viewPortWidth }}px; {% endif %}{% if viewPortHeight is not empty %}height: {{ viewPortHeight }}px; {% endif %}">
     <div class="pinto-ace" style="{% if viewPortWidth is not empty %}grid-column: span {{ viewPortWidth // 40 }} {% endif %}">
