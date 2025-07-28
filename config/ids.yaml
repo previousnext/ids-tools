@@ -16,15 +16,20 @@ parameters:
         - !php/const PreviousNext\Ds\Common\List\CommonLists::Lists
 
   ids.project_dir: '%env(PROJECT_DIR)%'
+  ids.webdriver.url: '%env(WEBDRIVER_URL)%'
+  # Set TWIG_CACHE_DIRECTORY to empty string to use \sys_get_temp_dir().
+  ids.twig.cache_dir: '%env(default::TWIG_CACHE_DIRECTORY)%'
   ids.ide: 'phpstorm'
 
   ids.build_objects:
     # File path relative to the Pinto Object class itself.
     directory: '/Tests/fixtures/snapshots'
 
+  # Default values.
+  env(WEBDRIVER_URL): 'http://firefox:4444/wd/hub'
+  env(TWIG_CACHE_DIRECTORY): '/data/app/cache/twig'
+
 # @todo other env vars and params, needed for command to work on host.
 #base url: http://http/ #(host varyable)
-#webdriver url: http://firefox:4444/wd/hub #(host varyable)
-#twig debug cache dir: /data/app/cache/twig #(host varyable). manual or allow ~ to use phptempdir/ids/twig/
 #dump location for html: output/html/
 #dump location for screenshots: output/screenshots/

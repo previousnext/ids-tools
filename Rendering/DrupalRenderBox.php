@@ -143,10 +143,13 @@ final class DrupalRenderBox {
     return [$libraryCss, $libraryJs];
   }
 
-  public function createTemplateLoader(FilesystemLoader $loader): TemplateLoader {
+  public function createTemplateLoader(
+    FilesystemLoader $loader,
+    ?string $twigCacheDirectory = NULL,
+  ): TemplateLoader {
     $twig = new Environment($loader, [
       'debug' => TRUE,
-      'cache' => '/data/app/cache/twig',
+      'cache' => $twigCacheDirectory,
       // https://symfony.com/doc/current/reference/configuration/twig.html#strict-variables
       // @todo.
       // 'strict_variables' => TRUE, @codingStandardsIgnoreLine

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace PreviousNext\IdsTools\DependencyInjection;
 
-use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\pinto\PintoCompilerPass;
 use Drupal\pinto\PintoMappingFactory;
 use Pinto\PintoMapping;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;

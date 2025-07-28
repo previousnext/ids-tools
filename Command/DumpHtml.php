@@ -59,6 +59,7 @@ final class DumpHtml extends Command {
   private DrupalRenderBox $box;
 
   private ?RemoteWebDriver $driver = NULL;
+  private string $twigCacheDirectory;
 
   /**
    * @phpstan-param array<class-string<\Pinto\List\ObjectListInterface>> $primaryLists
@@ -73,8 +74,17 @@ final class DumpHtml extends Command {
     private string $projectDir,
     #[Autowire('%' . IdsCompilerPass::PRIMARY_LISTS . '%')]
     private array $primaryLists,
+    #[Autowire('%ids.webdriver.url%')]
+    private string $webdriverUrl,
+    #[Autowire('%ids.twig.cache_dir%')]
+    ?string $twigCacheDirectory = NULL,
     private Stopwatch $stopwatch = new Stopwatch(),
   ) {
+    $this->twigCacheDirectory = $twigCacheDirectory ?? \sys_get_temp_dir();
+    if (!\is_dir($this->twigCacheDirectory)) {
+      throw new \Exception(\sprintf('Directory `%s` does not exist', $this->twigCacheDirectory));
+    }
+
     /** @var array<string, array{path: string, template: string, variables: array<string, mixed>}> $hookThemeDefinitions */
     $hookThemeDefinitions = \unserialize($hookTheme);
     $this->box = DrupalRenderBox::from($this->pintoMapping, $hookThemeDefinitions);
@@ -190,7 +200,7 @@ final class DumpHtml extends Command {
    */
   private function process(CompiledScenario $scenario, object $scenarioObject, LoaderInterface $loader, SymfonyStyle $io, bool $screenshots): void {
     $fs = new Filesystem();
-    $templateLoader = $this->box->createTemplateLoader($loader);
+    $templateLoader = $this->box->createTemplateLoader($loader, $this->twigCacheDirectory);
     $needLibraries = new Collection('string');
 
     // Render the Scenario itself.
@@ -218,8 +228,7 @@ final class DumpHtml extends Command {
     $loader = new FilesystemLoader([\dirname($vrcfileName)]);
     $twig = new Environment($loader, options: [
       'debug' => TRUE,
-    // @todo make configurable
-      'cache' => '/data/app/cache/twig',
+      'cache' => $this->twigCacheDirectory,
     ]);
 
     // @todo make configurable (TODO#0005)
@@ -335,17 +344,13 @@ final class DumpHtml extends Command {
       return $this->driver;
     }
 
-    // @todo configurable.
-    // $serverUrl = 'http://localhost:9444/wd/hub';
-    // $serverUrl = 'http://localhost:4444/wd/hub';
     $profile = new FirefoxProfile();
     $profile->setPreference('layout.css.devPixelsPerPx', '4.0');
-    $serverUrl = 'http://firefox:4444/wd/hub';
     $firefoxOptions = new FirefoxOptions();
     $firefoxOptions->setProfile($profile);
     $desiredCapabilities = DesiredCapabilities::firefox();
     $desiredCapabilities->setCapability(FirefoxOptions::CAPABILITY, $firefoxOptions);
-    $driver = RemoteWebDriver::create($serverUrl, $desiredCapabilities, 2000);
+    $driver = RemoteWebDriver::create($this->webdriverUrl, $desiredCapabilities, 2000);
     return $this->driver = $driver;
   }
 
