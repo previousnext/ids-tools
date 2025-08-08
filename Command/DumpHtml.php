@@ -234,11 +234,18 @@ final class DumpHtml extends Command {
     // @todo make configurable (TODO#0005)
     $htmlDiskRoot = \Safe\realpath(__DIR__ . '/../../../output/html');
     $screenshotDiskRoot = \Safe\realpath(__DIR__ . '/../../../output/screenshots');
+    $snippetDiskRoot = \Safe\realpath(__DIR__ . '/../../../output/code-snippets');
 
     $rEnum = new \ReflectionClass(($scenario->pintoEnum ?? throw new \LogicException())::class);
     $locationSuffix = \sprintf('/%s/%s/%s', $rEnum->getShortName(), $scenario->pintoEnum->name, $scenario->id);
     $dumpHtmlTo = $htmlDiskRoot . $locationSuffix;
     $dumpScreenshotsTo = $screenshotDiskRoot . $locationSuffix;
+
+    $code = $scenario->scenarioCode();
+    if ($code !== NULL) {
+      $code = "```php\n" . $code . "\n```\n";
+      $fs->dumpFile($snippetDiskRoot . $locationSuffix . '.md', $code);
+    }
 
     [$css, $js] = $this->box->collectLibraries($needLibraries);
 
