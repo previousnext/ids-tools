@@ -12,11 +12,14 @@ use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverDimension;
 use Pinto\PintoMapping;
+use PreviousNext\Ds\Common\Component\Media\Image\Image;
 use PreviousNext\Ds\Common\List as CommonLists;
 use PreviousNext\Ds\Common\Utility\Twig as CommonTwig;
+use PreviousNext\Ds\Common\Vo\Id\Id;
 use PreviousNext\Ds\Mixtape\Utility\Twig as MixtapeTwig;
 use PreviousNext\Ds\Nsw\Utility\Twig as NswTwig;
 use PreviousNext\IdsTools\DependencyInjection\IdsCompilerPass;
+use PreviousNext\IdsTools\ImageGeneration\DumperImageGenerator;
 use PreviousNext\IdsTools\Pinto\VisualRegressionContainer\VisualRegressionContainer;
 use PreviousNext\IdsTools\Rendering\DrupalRenderBox;
 use PreviousNext\IdsTools\Scenario\CompiledScenario;
@@ -199,6 +202,9 @@ final class DumpHtml extends Command {
    * Process a single scenario, outputting HTML & Assets, and screenshots.
    */
   private function process(CompiledScenario $scenario, object $scenarioObject, LoaderInterface $loader, SymfonyStyle $io, bool $screenshots): void {
+    Id::resetGlobalState();
+    Image::setImageGenerator(DumperImageGenerator::class);
+
     $fs = new Filesystem();
     $templateLoader = $this->box->createTemplateLoader($loader, $this->twigCacheDirectory);
     $needLibraries = new Collection('string');

@@ -17,7 +17,8 @@
         "symfony/serializer": "^7.2",
         "symfony/stopwatch": "^7.2",
         "thecodingmachine/safe": "^3.3",
-        "twig/twig": "^3.21"
+        "twig/twig": "^3.21",
+        "imagine/imagine": "^1.5"
     },
     "autoload": {
         "psr-4": {

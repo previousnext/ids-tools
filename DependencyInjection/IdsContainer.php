@@ -7,6 +7,8 @@ namespace PreviousNext\IdsTools\DependencyInjection;
 use Drupal\pinto\PintoCompilerPass;
 use Drupal\pinto\PintoMappingFactory;
 use Pinto\PintoMapping;
+use PreviousNext\Ds\Common\Component\Media\Image\Image;
+use PreviousNext\IdsTools\ImageGeneration\DumperImageGenerator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -30,6 +32,9 @@ final class IdsContainer {
 
     $container->addCompilerPass(new IdsCompilerPass());
     $container->addCompilerPass(new PintoCompilerPass());
+
+    Image::setImageGenerator(DumperImageGenerator::class);
+
     \Drupal::setContainer($container);
   }
 
