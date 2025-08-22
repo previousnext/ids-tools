@@ -359,6 +359,7 @@ final class DumpHtml extends Command {
 
     $profile = new FirefoxProfile();
     $profile->setPreference('layout.css.devPixelsPerPx', '4.0');
+    $profile->setPreference('ui.prefersReducedMotion', 1);
     $firefoxOptions = new FirefoxOptions();
     $firefoxOptions->setProfile($profile);
     $desiredCapabilities = DesiredCapabilities::firefox();
