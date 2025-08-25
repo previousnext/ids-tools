@@ -13,6 +13,7 @@ use PreviousNext\IdsTools\Scenario\Scenarios;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -30,7 +31,7 @@ use Symfony\Component\Yaml\Yaml;
  * trailing comma issues.
  */
 #[AsCommand(
-    name: 'dump:build-objects',
+  name: 'dump:build-objects',
 )]
 final class DumpBuildObjectSnapshots extends Command {
 
@@ -53,8 +54,20 @@ final class DumpBuildObjectSnapshots extends Command {
     parent::__construct();
   }
 
+  protected function configure(): void {
+    parent::configure();
+    $this
+      ->addOption('dry-run', 'd', InputOption::VALUE_NONE);
+  }
+
   protected function execute(InputInterface $input, OutputInterface $output): int {
+    $isDryRun = (bool) $input->getOption('dry-run');
+
     $io = new SymfonyStyle($input, $output);
+    if ($isDryRun) {
+      $io->writeln('This is a dry run.');
+    }
+
     $io->writeln('Starting...');
     $outputRelativeToObject = $this->buildObjectConfiguration['directory'];
 
@@ -87,11 +100,15 @@ final class DumpBuildObjectSnapshots extends Command {
       }
 
       $this->stopwatch->lap('snapshot write');
-      $fs->dumpFile($fileName = static::getDiskLocationForScenario($scenario, $outputRelativeToObject), $this->serializer->serialize($rendered, 'yaml', [
-        'yaml_flags' => Yaml::DUMP_OBJECT | Yaml::PARSE_CUSTOM_TAGS | Yaml::DUMP_NULL_AS_TILDE | Yaml::PARSE_CONSTANT,
-        'yaml_inline' => 100,
-        'yaml_indent' => 0,
-      ]));
+      $fileName = static::getDiskLocationForScenario($scenario, $outputRelativeToObject);
+      if ($isDryRun === FALSE) {
+        $fs->dumpFile($fileName, $this->serializer->serialize($rendered, 'yaml', [
+          'yaml_flags' => Yaml::DUMP_OBJECT | Yaml::PARSE_CUSTOM_TAGS | Yaml::DUMP_NULL_AS_TILDE | Yaml::PARSE_CONSTANT,
+          'yaml_inline' => 100,
+          'yaml_indent' => 0,
+        ]));
+      }
+
       $io->writeln(\sprintf("Writing %s to %s", $scenario->id ?? throw new \LogicException(), $fileName));
     }
     $this->stopwatch->stop('snapshot write');
