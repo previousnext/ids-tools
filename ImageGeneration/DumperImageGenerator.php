@@ -36,7 +36,7 @@ final class DumperImageGenerator implements ImageGenerationInterface {
 
     // Same as note the other one in DumpHtml.
     // @todo make configurable (TODO#0005)
-    $htmlDiskRoot = \Safe\realpath(__DIR__ . '/../../../output/html');
+    $htmlDiskRoot = \Safe\realpath(\getcwd() . '/output/html');
     $destination = \sprintf('%s-%s-%s', $width, $height, $fileName);
     if (\file_exists($htmlDiskRoot . '/' . $destination)) {
       return static::$filePaths[$hash] = \sprintf('/%s', $destination);
@@ -50,7 +50,6 @@ final class DumperImageGenerator implements ImageGenerationInterface {
     $resizedPath = \Safe\tempnam(\sys_get_temp_dir(), 'ids-imggen');
     $image->save($resizedPath);
 
-    $htmlDiskRoot = \Safe\realpath(__DIR__ . '/../../../output/html');
     \Safe\file_put_contents(
       \sprintf('%s/%s', $htmlDiskRoot, $destination),
       \Safe\file_get_contents($resizedPath),

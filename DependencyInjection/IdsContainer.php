@@ -8,6 +8,7 @@ use Drupal\pinto\PintoCompilerPass;
 use Drupal\pinto\PintoMappingFactory;
 use Pinto\PintoMapping;
 use PreviousNext\Ds\Common\Component\Media\Image\Image;
+use PreviousNext\IdsTools\Command\DumpBuildObjectSnapshots;
 use PreviousNext\IdsTools\ImageGeneration\DumperImageGenerator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -44,7 +45,7 @@ final class IdsContainer {
   public static function testContainers(): \Generator {
     $baseContainer = new ContainerBuilder();
 
-    $fileLocator = new FileLocator([__DIR__ . '/../config']);
+    $fileLocator = new FileLocator([\getcwd() . '/.ids-config', __DIR__ . '/../config']);
     $loader = new YamlFileLoader($baseContainer, $fileLocator);
     $loader->load('ids.yaml');
 
@@ -58,12 +59,16 @@ final class IdsContainer {
   public static function testContainerForDs(string $ds): ContainerInterface {
     $container = new ContainerBuilder();
 
-    $fileLocator = new FileLocator([__DIR__ . '/../config']);
+    $fileLocator = new FileLocator([\getcwd() . '/.ids-config', __DIR__ . '/../config']);
     $loader = new YamlFileLoader($container, $fileLocator);
     $loader->load('ids.yaml');
 
     /** @var 'mixtape'|'nswds' $ds */
     $container->setParameter('ids.design_system', $ds);
+
+    // Needed to add scenarios runs as coverage.
+    $container->register(DumpBuildObjectSnapshots::class, DumpBuildObjectSnapshots::class)
+      ->setPublic(TRUE)->setAutowired(TRUE);
 
     IdsContainer::setupContainer($container);
     $container->compile();
