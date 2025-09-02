@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PreviousNext\IdsTools\Command;
 
 use Drupal\Core\Template\Attribute;
+use Facebook\WebDriver\Exception\WebDriverException;
 use Facebook\WebDriver\Firefox\FirefoxOptions;
 use Facebook\WebDriver\Firefox\FirefoxProfile;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
@@ -166,6 +167,8 @@ final class DumpHtml extends Command {
     $progress->setFormat('custom');
     $progress->setMaxSteps(\count($scenarios));
     $screenshots = !$input->getOption('no-screenshots');
+
+    $isPassingSoFar = TRUE;
     foreach ($scenarios as $scenario) {
       $scenarioObject = $scenarios[$scenario];
       $rEnum = new \ReflectionClass(($scenario->pintoEnum ?? throw new \LogicException())::class);
@@ -176,7 +179,7 @@ final class DumpHtml extends Command {
       $this->stopwatch->start($scenarioStopwatch);
 
       $io2 = new SymfonyStyle($input, $section1);
-      $this->process($scenario, $scenarioObject, $loader, $io2, $screenshots);
+      $isPassingSoFar &= $this->process($scenario, $scenarioObject, $loader, $io2, $screenshots);
 
       $this->stopwatch->stop($scenarioStopwatch);
       $progress->advance();
@@ -195,13 +198,17 @@ final class DumpHtml extends Command {
     $io->writeln('Disconnecting from webdriver...');
     $this->driver?->quit();
     $io->writeln('Done.');
-    return self::SUCCESS;
+
+    return (bool) $isPassingSoFar ? self::SUCCESS : self::FAILURE;
   }
 
   /**
    * Process a single scenario, outputting HTML & Assets, and screenshots.
+   *
+   * @return bool
+   *   Whether the process was successful.
    */
-  private function process(CompiledScenario $scenario, object $scenarioObject, LoaderInterface $loader, SymfonyStyle $io, bool $screenshots): void {
+  private function process(CompiledScenario $scenario, object $scenarioObject, LoaderInterface $loader, SymfonyStyle $io, bool $screenshots): bool {
     Id::resetGlobalState();
     Image::setImageGenerator(DumperImageGenerator::class);
 
@@ -217,7 +224,7 @@ final class DumpHtml extends Command {
     }
     catch (\Exception $e) {
       $io->error('Failed to render template: ' . $e->getMessage());
-      return;
+      return FALSE;
     }
     $this->stopwatch->stop('rendering');
 
@@ -331,7 +338,7 @@ final class DumpHtml extends Command {
     $fs->dumpFile($dumpHtmlTo . '/index.html', $outerRendered);
 
     if ($screenshots === FALSE) {
-      return;
+      return TRUE;
     }
 
     // Navigate and take a screenshot.
@@ -349,7 +356,16 @@ final class DumpHtml extends Command {
     $driver->get($requestUrl);
     $io->writeln('Taking screenshot...');
     $screenshotArea = $driver->findElement(WebDriverBy::id('pinto-ace-screenshot-area'));
-    $screenshotArea->takeElementScreenshot(\sprintf('%s.png', $dumpScreenshotsTo));
+    // Common reason for this failing is there is no data to screenshot, i.e, a bad template problem.
+    try {
+      $screenshotArea->takeElementScreenshot(\sprintf('%s.png', $dumpScreenshotsTo));
+    }
+    catch (WebDriverException $e) {
+      $io->error('Failed to take screenshot for `' . $scenario . '`: ' . $e->getMessage());
+      return FALSE;
+    }
+
+    return TRUE;
   }
 
   private function driver(): RemoteWebDriver {
