@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class IdsContainer {
 
-  public static function setupContainer(?ContainerInterface $container = NULL): void {
+  public static function setupContainer(?ContainerBuilder $container = NULL): void {
     $container ??= new ContainerBuilder();
     $container->setParameter('container.namespaces', []);
     $container->setParameter('pinto.namespaces', []);
@@ -40,9 +40,10 @@ final class IdsContainer {
   }
 
   /**
-   * @phpstan-return \Generator<ContainerInterface>
+   * @phpstan-param (callable(ContainerBuilder): void)|null $beforeCompile
+   * @phpstan-return \Generator<string, ContainerInterface>
    */
-  public static function testContainers(): \Generator {
+  public static function testContainers(?callable $beforeCompile = NULL): \Generator {
     $baseContainer = new ContainerBuilder();
 
     $fileLocator = new FileLocator([\getcwd() . '/.ids-config', __DIR__ . '/../config']);
@@ -52,11 +53,14 @@ final class IdsContainer {
     /** @var array<string, array{ds: array<class-string<\Pinto\List\ObjectListInterface>>, additional?: array<array<class-string<\Pinto\List\ObjectListInterface>>>}> $dsList */
     $dsList = $baseContainer->getParameter('ids.design_systems');
     foreach (\array_keys($dsList) as $ds) {
-      yield $ds => static::testContainerForDs($ds);
+      yield $ds => static::testContainerForDs($ds, $beforeCompile);
     }
   }
 
-  public static function testContainerForDs(string $ds): ContainerInterface {
+  /**
+   * @phpstan-param (callable(ContainerBuilder): void)|null $beforeCompile
+   */
+  public static function testContainerForDs(string $ds, ?callable $beforeCompile = NULL): ContainerInterface {
     $container = new ContainerBuilder();
 
     $fileLocator = new FileLocator([\getcwd() . '/.ids-config', __DIR__ . '/../config']);
@@ -71,6 +75,9 @@ final class IdsContainer {
       ->setPublic(TRUE)->setAutowired(TRUE);
 
     IdsContainer::setupContainer($container);
+    if ($beforeCompile !== NULL) {
+      $beforeCompile($container);
+    }
     $container->compile();
     return $container;
   }

@@ -18,7 +18,8 @@
         "symfony/stopwatch": "^7.2",
         "thecodingmachine/safe": "^3.3",
         "twig/twig": "^3.21",
-        "imagine/imagine": "^1.5"
+        "imagine/imagine": "^1.5",
+        "good-php/reflection": "^2.2"
     },
     "autoload": {
         "psr-4": {
