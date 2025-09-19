@@ -98,7 +98,7 @@ final class CompiledScenario {
     }
 
     // Remove last line if it has a `return`.
-    if (\str_contains($trimmedLines[\array_key_last($trimmedLines)], 'return ')) {
+    if (\count($trimmedLines) !== 0 && \str_contains($trimmedLines[\array_key_last($trimmedLines)], 'return ')) {
       unset($trimmedLines[\array_key_last($trimmedLines)]);
     }
 
