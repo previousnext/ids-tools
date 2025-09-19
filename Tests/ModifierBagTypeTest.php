@@ -80,6 +80,7 @@ final class ModifierBagTypeTest extends TestCase {
       Nsw\Layout\Grid\GridItem\GridItem::class . '$modifiers' => Common\Layout\Grid\GridItem\GridItemModifierInterface::class,
       Nsw\Layout\Masthead\Masthead::class . '$modifiers' => Common\Layout\Masthead\MastheadModifierInterface::class,
       Nsw\Layout\Section\Section::class . '$modifiers' => Common\Layout\Section\SectionModifierInterface::class,
+      Nsw\Layout\Sidebar\Sidebar::class . '$modifiers' => Common\Layout\Sidebar\SidebarModifierInterface::class,
     ];
 
     foreach (IdsContainer::testContainers() as $ds => $container) {
