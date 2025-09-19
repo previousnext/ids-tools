@@ -80,6 +80,7 @@ final class ModifierBagDiscoveryTest extends TestCase {
       Mixtape\Layout\Section\Section::class => [
         Mixtape\Layout\Section\SectionSize::class,
         Mixtape\Layout\Section\SectionBackground::class,
+        Mixtape\Layout\Section\SectionWidth::class,
       ],
       Mixtape\Layout\Sidebar\Sidebar::class => [
         Mixtape\Layout\Sidebar\SidebarOrderModifier::class,
