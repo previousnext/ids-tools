@@ -79,6 +79,7 @@ final class ModifierBagTypeTest extends TestCase {
       Nsw\Layout\Footer\Footer::class . '$modifiers' => Common\Layout\Footer\FooterModifierInterface::class,
       Nsw\Layout\Grid\Grid::class . '$modifiers' => Common\Layout\Grid\GridModifierInterface::class,
       Nsw\Layout\Grid\GridItem\GridItem::class . '$modifiers' => Common\Layout\Grid\GridItem\GridItemModifierInterface::class,
+      Nsw\Layout\Header\Header::class . '$modifiers' => Common\Layout\Header\HeaderModifierInterface::class,
       Nsw\Layout\Masthead\Masthead::class . '$modifiers' => Common\Layout\Masthead\MastheadModifierInterface::class,
       Nsw\Layout\Section\Section::class . '$modifiers' => Common\Layout\Section\SectionModifierInterface::class,
       Nsw\Layout\Sidebar\Sidebar::class . '$modifiers' => Common\Layout\Sidebar\SidebarModifierInterface::class,
