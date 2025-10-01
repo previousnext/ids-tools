@@ -99,6 +99,10 @@ final class ModifierBagDiscoveryTest extends TestCase {
       Nsw\Component\HeroBanner\HeroBanner::class => [
         Nsw\Component\HeroBanner\HeroBannerBackground::class,
       ],
+      Nsw\Component\ListItem\ListItem::class => [
+        Common\Component\ListItem\DisplayLinkAs::class,
+        Common\Component\ListItem\ImagePosition::class,
+      ],
       Nsw\Layout\Footer\Footer::class => [
         Nsw\Layout\Footer\FooterBackground::class,
       ],

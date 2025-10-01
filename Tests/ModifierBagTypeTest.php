@@ -75,6 +75,7 @@ final class ModifierBagTypeTest extends TestCase {
       Nsw\Atom\Icon\Icon::class . '$modifiers' => Common\Atom\Icon\IconModifierInterface::class,
       Nsw\Component\Card\Card::class . '$modifiers' => Common\Component\Card\CardModifierInterface::class,
       Nsw\Component\HeroBanner\HeroBanner::class . '$modifiers' => Common\Component\HeroBanner\HeroBannerModifierInterface::class,
+      Nsw\Component\ListItem\ListItem::class . '$modifiers' => Common\Component\ListItem\ListItemModifierInterface::class,
       Nsw\Layout\Footer\Footer::class . '$modifiers' => Common\Layout\Footer\FooterModifierInterface::class,
       Nsw\Layout\Grid\Grid::class . '$modifiers' => Common\Layout\Grid\GridModifierInterface::class,
       Nsw\Layout\Grid\GridItem\GridItem::class . '$modifiers' => Common\Layout\Grid\GridItem\GridItemModifierInterface::class,
