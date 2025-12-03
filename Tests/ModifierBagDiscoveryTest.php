@@ -66,7 +66,11 @@ final class ModifierBagDiscoveryTest extends TestCase {
         Mixtape\Layout\Footer\FooterBackground::class,
       ],
       Mixtape\Layout\Grid\Grid::class => [
-        Mixtape\Layout\Grid\GridColumnSizeModifier::class,
+        Mixtape\Layout\Grid\GridColumnSizeModifierExtraLarge::class,
+        Mixtape\Layout\Grid\GridColumnSizeModifierExtraSmall::class,
+        Mixtape\Layout\Grid\GridColumnSizeModifierLarge::class,
+        Mixtape\Layout\Grid\GridColumnSizeModifierMedium::class,
+        Mixtape\Layout\Grid\GridColumnSizeModifierSmall::class,
       ],
       Mixtape\Layout\Grid\GridItem\GridItem::class => [
         Mixtape\Layout\Grid\GridItem\GridItemSpanModifier::class,
