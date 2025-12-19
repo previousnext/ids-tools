@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace PreviousNext\IdsTools\Command;
 
+use Drupal\pinto\Build\BuildRegistryInterface;
 use Pinto\Attribute\Definition;
 use Pinto\PintoMapping;
 use PreviousNext\Ds\Common\Vo\Id\Id;
 use PreviousNext\IdsTools\DependencyInjection\IdsCompilerPass;
+use PreviousNext\IdsTools\Rendering\ComponentRender;
 use PreviousNext\IdsTools\Scenario\CompiledScenario;
 use PreviousNext\IdsTools\Scenario\Scenarios;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -43,6 +45,7 @@ final class DumpBuildObjectSnapshots extends Command {
    * @phpstan-param array<class-string<\Pinto\List\ObjectListInterface>> $primaryLists
    */
   public function __construct(
+    private BuildRegistryInterface $buildRegistry,
     private PintoMapping $pintoMapping,
     #[Autowire(param: 'ids.build_objects')]
     private array $buildObjectConfiguration,
@@ -93,7 +96,13 @@ final class DumpBuildObjectSnapshots extends Command {
     foreach ($scenarios as [$scenario, $scenarioObject, $objectClassName]) {
       try {
         Id::resetGlobalState();
-        $rendered = $scenarioObject();
+
+        \assert(\is_object($scenarioObject));
+        $rendered = ComponentRender::render(
+          $this->pintoMapping,
+          $this->buildRegistry,
+          $scenarioObject,
+        );
       }
       catch (\Throwable $e) {
         throw new \Exception(\sprintf('Failed to render scenario from %s', (string) $scenario), previous: $e);

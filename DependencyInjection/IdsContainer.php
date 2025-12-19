@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace PreviousNext\IdsTools\DependencyInjection;
 
+use Drupal\pinto\Build\BuildRegistryInterface;
 use Drupal\pinto\PintoCompilerPass;
 use Drupal\pinto\PintoMappingFactory;
 use Pinto\PintoMapping;
 use PreviousNext\Ds\Common\Component\Media\Image\Image;
 use PreviousNext\IdsTools\Command\DumpBuildObjectSnapshots;
+use PreviousNext\IdsTools\DependencyInjection\Build\IdsToolsBuildRegistry;
 use PreviousNext\IdsTools\ImageGeneration\DumperImageGenerator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -26,6 +28,8 @@ final class IdsContainer {
     $container ??= new ContainerBuilder();
     $container->setParameter('container.namespaces', []);
     $container->setParameter('pinto.namespaces', []);
+    $container->setParameter('pinto.components', []);
+    $container->setDefinition(BuildRegistryInterface::class, (new Definition(IdsToolsBuildRegistry::class))->setPublic(TRUE)->setAutowired(TRUE));
     $container->setDefinition(PintoMappingFactory::class, new Definition(PintoMappingFactory::class));
     $container->setDefinition(PintoMapping::class, $pintoMappingDefinition = new Definition());
     $pintoMappingDefinition->setPublic(TRUE);

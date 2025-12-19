@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PreviousNext\IdsTools\Command;
 
 use Drupal\Core\Template\Attribute;
+use Drupal\pinto\Build\BuildRegistryInterface;
 use Facebook\WebDriver\Exception\WebDriverException;
 use Facebook\WebDriver\Firefox\FirefoxOptions;
 use Facebook\WebDriver\Firefox\FirefoxProfile;
@@ -12,6 +13,7 @@ use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverDimension;
+use Pinto\List\Resource\ObjectListEnumResource;
 use Pinto\PintoMapping;
 use PreviousNext\Ds\Common\Component\Media\Image\Image;
 use PreviousNext\Ds\Common\List as CommonLists;
@@ -69,6 +71,7 @@ final class DumpHtml extends Command {
    * @phpstan-param array<class-string<\Pinto\List\ObjectListInterface>> $primaryLists
    */
   public function __construct(
+    private BuildRegistryInterface $buildRegistry,
     private PintoMapping $pintoMapping,
     #[Autowire('%pinto.internal.hook_theme%')]
     string $hookTheme,
@@ -91,7 +94,7 @@ final class DumpHtml extends Command {
 
     /** @var array<string, array{path: string, template: string, variables: array<string, mixed>}> $hookThemeDefinitions */
     $hookThemeDefinitions = \unserialize($hookTheme);
-    $this->box = DrupalRenderBox::from($this->pintoMapping, $hookThemeDefinitions);
+    $this->box = DrupalRenderBox::from($this->buildRegistry, $this->pintoMapping, $hookThemeDefinitions);
     $this->ideLaunch = self::IDE_LAUNCH[$ide] ?? throw new \Exception('Unknown IDE: ' . $ide);
     parent::__construct();
   }
@@ -269,6 +272,7 @@ final class DumpHtml extends Command {
     $io->writeln('Dumping CSS and JS...');
     $i = 0;
     foreach ($css as $absoluteFileName => $definition) {
+      $absoluteFileName = \DRUPAL_ROOT . $absoluteFileName;
       $i++;
       $assetPath = \sprintf('/css/%s-%s', $i, \basename($absoluteFileName));
       if (isset($definition['attributes'])) {
@@ -276,10 +280,11 @@ final class DumpHtml extends Command {
         $definition['attributes'] = new Attribute($definition['attributes']);
       }
       $cssPaths[] = ['href' => $locationSuffix . $assetPath] + $definition;
-      $fs->dumpFile(\sprintf('%s%s', $dumpHtmlTo, $assetPath), \file_get_contents($absoluteFileName));
+      $fs->dumpFile(\sprintf('%s%s', $dumpHtmlTo, $assetPath), \Safe\file_get_contents($absoluteFileName));
     }
     $i = 0;
     foreach ($js as $absoluteFileName => $definition) {
+      $absoluteFileName = \DRUPAL_ROOT . $absoluteFileName;
       $i++;
       $assetPath = \sprintf('/js/%s-%s', $i, \basename($absoluteFileName));
       if (isset($definition['attributes'])) {
@@ -287,7 +292,7 @@ final class DumpHtml extends Command {
         $definition['attributes'] = new Attribute($definition['attributes']);
       }
       $jsPaths[] = ['src' => $locationSuffix . $assetPath] + $definition;
-      $fs->dumpFile(\sprintf('%s%s', $dumpHtmlTo, $assetPath), \file_get_contents($absoluteFileName));
+      $fs->dumpFile(\sprintf('%s%s', $dumpHtmlTo, $assetPath), \Safe\file_get_contents($absoluteFileName));
     }
 
     $commonLeftPrefix = static function (string $a, string $b): int {
@@ -308,7 +313,17 @@ final class DumpHtml extends Command {
 
     $io->writeln('Debugging information...');
     // Debugging vars.
-    $enum = $this->pintoMapping->getByClass($scenarioObject::class);
+    $resource = $this->pintoMapping->getResource($scenarioObject::class);
+    if (!$resource instanceof ObjectListEnumResource) {
+      // @todo need to fix this if we want to support Standalone components.
+      throw new \LogicException('Not supported right now...');
+    }
+
+    if (NULL === $resource->getClass()) {
+      throw new \LogicException('Not supported right now...');
+    }
+
+    $enum = $resource->pintoEnum;
     $r = new \ReflectionEnum($enum);
     $enumHref = \sprintf($this->ideLaunch, $this->projectDir . '/' . \substr($r->getFileName(), $commonLeftPrefix($r->getFileName(), \DRUPAL_ROOT)), (string) $r->getStartLine());
     $r = new \ReflectionClass($scenarioObject::class);
