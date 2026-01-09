@@ -34,7 +34,7 @@ final class IdsToolsBuildRegistry implements BuildRegistryInterface {
     return $token;
   }
 
-  public function render(BuildToken $buildToken): array {
+  public function render(BuildToken $buildToken, array $element): array {
     $buildData = $this->map[$buildToken] ?? throw new \Exception('Cannot find build data for provided token.');
 
     $objectClassName = $buildData->resource->getClass() ?? throw new \LogicException('Missing definition for slot');
@@ -56,6 +56,8 @@ final class IdsToolsBuildRegistry implements BuildRegistryInterface {
       '#attached' => ['library' => DrupalLibraryBuilder::attachLibraries($buildData->resource)],
     ] + $twigContext;
 
+    // We're returning render arrays, not pre-rendered markup like Pinto.
+    // @phpstan-ignore-next-line return.type
     return $renderArray;
   }
 

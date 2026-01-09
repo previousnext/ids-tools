@@ -31,7 +31,7 @@ final class ComponentRender {
 
       if (($rendered['#type'] ?? '') === PintoComponentElement::class) {
         $buildToken = $rendered['#buildToken'];
-        $renderArrayExpanded = $buildRegistry->render($buildToken);
+        $renderArrayExpanded = $buildRegistry->render($buildToken, []);
         unset($rendered['#type']);
         unset($rendered['#buildToken']);
         $rendered = $renderArrayExpanded + $rendered;

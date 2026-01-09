@@ -190,7 +190,7 @@ final class DrupalRenderBox {
     $result = [($this->builder)($obj)];
 
     $buildRegistryRender = function (BuildToken $buildToken): array {
-      return $this->buildRegistry->render($buildToken);
+      return $this->buildRegistry->render($buildToken, []);
     };
 
     ($loop = static function (&$build) use (&$loop, $templateLoader, $needLibraries, $obj, $buildRegistryRender): void {
