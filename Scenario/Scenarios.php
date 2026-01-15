@@ -34,7 +34,7 @@ final class Scenarios {
 
   /**
    * @phpstan-param array<class-string<\Pinto\List\ObjectListInterface>> $filterByEnumClasses
-   * @phpstan-return \Generator<\PreviousNext\IdsTools\Scenario\CompiledScenario, callable&object>
+   * @phpstan-return \Generator<\PreviousNext\IdsTools\Scenario\CompiledScenario, \PreviousNext\IdsTools\Scenario\ScenarioSubject>
    */
   public static function findScenarios(PintoMapping $pintoMapping, array $filterByEnumClasses = []): \Generator {
     /** @var array<class-string<\Pinto\List\ObjectListInterface>, array<\Pinto\Resource\ResourceInterface>> $resourcesByEnumClass */
@@ -80,7 +80,7 @@ final class Scenarios {
   }
 
   /**
-   * @phpstan-return \Generator<\PreviousNext\IdsTools\Scenario\CompiledScenario, callable&object>
+   * @phpstan-return \Generator<\PreviousNext\IdsTools\Scenario\CompiledScenario, \PreviousNext\IdsTools\Scenario\ScenarioSubject>
    */
   private static function findScenariosOnClass(\ReflectionClass $rClass, ResourceInterface $resource, bool $allMethods): \Generator {
     foreach ($rClass->getMethods(\ReflectionMethod::IS_STATIC) as $rMethod) {
@@ -119,7 +119,7 @@ final class Scenarios {
       /** @var \Generator<string|int, callable-object>|callable-object $result */
       $result = $compiledScenario();
       if (!$result instanceof \Generator) {
-        yield $compiledScenario => $result;
+        yield $compiledScenario => ScenarioSubject::createFromCallableObject($result);
         // Yield $compiledScenario->id => [$result, $compiledScenario];.
         continue;
       }
@@ -132,7 +132,7 @@ final class Scenarios {
         );
         // $k can be customised in the scenario generator by using syntax:
         // `yield 'SCENARIONAME' => $object;`
-        yield $newScenario => $r;
+        yield $newScenario => ScenarioSubject::createFromCallableObject($r);
         // Yield $compiledScenario->id => [$r, $compiledScenario];.
       }
     }

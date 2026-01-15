@@ -19,7 +19,7 @@ final class CompiledScenario {
    *   The enum case associated with this scenario. Should not be provided when
    *   defining a #[Scenario], instead this is populated automatically by
    *   internals.
-   * @phpstan-param array{class-string, string}
+   * @phpstan-param array{class-string, string} $scenario
    *   A callable to generate the scenario.
    * @phpstan-param positive-int $viewPortWidth
    * @phpstan-param positive-int $viewPortHeight
@@ -117,6 +117,7 @@ final class CompiledScenario {
    * @phpstan-return (callable(): (callable-object|\Generator))
    */
   public function __invoke(): mixed {
+    \assert(\is_callable($this->scenario));
     return (($this->scenario)(...))();
   }
 

@@ -78,13 +78,13 @@ final class DumpBuildObjectSnapshots extends Command {
     $io->writeln('Object starting...');
 
     // Get the Objects and their Scenarios.
-    /** @var array<array{\PreviousNext\IdsTools\Scenario\CompiledScenario, callable, class-string}> $scenarios */
+    /** @var array<array{\PreviousNext\IdsTools\Scenario\CompiledScenario, \PreviousNext\IdsTools\Scenario\ScenarioSubject, class-string}> $scenarios */
     $scenarios = [];
-    foreach (Scenarios::findScenarios($this->pintoMapping, $this->primaryLists) as $scenario => $scenarioObject) {
+    foreach (Scenarios::findScenarios($this->pintoMapping, $this->primaryLists) as $scenario => $scenarioSubject) {
       $this->stopwatch->lap('object generation');
       $pintoEnum = $scenario->pintoEnum ?? throw new \LogicException();
       $definition = ((new \ReflectionEnumUnitCase($pintoEnum::class, $pintoEnum->name))->getAttributes(Definition::class)[0] ?? NULL)?->newInstance() ?? throw new \LogicException('Missing ' . Definition::class);
-      $scenarios[] = [$scenario, $scenarioObject, $definition->className];
+      $scenarios[] = [$scenario, $scenarioSubject, $definition->className];
     }
     $this->stopwatch->stop('object generation');
 
@@ -93,15 +93,15 @@ final class DumpBuildObjectSnapshots extends Command {
     $io->writeln('Writing snapshots');
 
     $fs = new Filesystem();
-    foreach ($scenarios as [$scenario, $scenarioObject, $objectClassName]) {
+    foreach ($scenarios as [$scenario, $scenarioSubject, $objectClassName]) {
       try {
         Id::resetGlobalState();
 
-        \assert(\is_object($scenarioObject));
         $rendered = ComponentRender::render(
           $this->pintoMapping,
           $this->buildRegistry,
-          $scenarioObject,
+          // When dumping snapshots, only the object in question not the full context.
+          $scenarioSubject->obj,
         );
       }
       catch (\Throwable $e) {

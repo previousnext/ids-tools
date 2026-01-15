@@ -119,7 +119,9 @@ final class DumpHtml extends Command {
     // generated and timed.
     /** @var \SplObjectStorage<\PreviousNext\IdsTools\Scenario\CompiledScenario, object&callable> $scenarios */
     $scenarios = new \SplObjectStorage();
-    foreach (Scenarios::findScenarios($this->pintoMapping, $this->primaryLists) as $scenario => $scenarioObject) {
+    foreach (Scenarios::findScenarios($this->pintoMapping, $this->primaryLists) as $scenario => $scenarioSubject) {
+      $scenarioObject = $scenarioSubject->renderableObject();
+
       $this->stopwatch->lap('object generation');
       $scenarios[$scenario] = $scenarioObject;
     }
