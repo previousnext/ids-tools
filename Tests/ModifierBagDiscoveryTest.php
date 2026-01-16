@@ -59,6 +59,9 @@ final class ModifierBagDiscoveryTest extends TestCase {
         Common\Component\ListItem\DisplayLinkAs::class,
         Common\Component\ListItem\ImagePosition::class,
       ],
+      Mixtape\Component\SocialShare\SocialShare::class => [
+        Common\Component\SocialShare\SocialMediaUrl::class,
+      ],
       Mixtape\Component\Steps\Steps::class => [
         Mixtape\Component\Steps\StepsBackground::class,
       ],
