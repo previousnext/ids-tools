@@ -19,7 +19,7 @@
         "thecodingmachine/safe": "^3.3",
         "twig/twig": "^3.21",
         "imagine/imagine": "^1.5",
-        "good-php/reflection": "^2.2"
+        "good-php/reflection": "^2.5.1"
     },
     "autoload": {
         "psr-4": {
