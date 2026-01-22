@@ -1,7 +1,6 @@
 {
     "name": "previousnext/ids-tools",
     "type": "library",
-    "version": "0.0.1",
     "keywords": [
         "dev"
     ],
