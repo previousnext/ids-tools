@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace PreviousNext\IdsTools\Scenario;
 
-use Pinto\List\Resource\ObjectListEnumResource;
+use Pinto\Attribute\Definition;
+use Pinto\List\ObjectListInterface;
 use Pinto\PintoMapping;
-use Pinto\Resource\ResourceInterface;
 
 /**
  * An attribute referencing scenarios for generating fixtures and tests.
@@ -37,32 +37,25 @@ final class Scenarios {
    * @phpstan-return \Generator<\PreviousNext\IdsTools\Scenario\CompiledScenario, \PreviousNext\IdsTools\Scenario\ScenarioSubject>
    */
   public static function findScenarios(PintoMapping $pintoMapping, array $filterByEnumClasses = []): \Generator {
-    /** @var array<class-string<\Pinto\List\ObjectListInterface>, array<\Pinto\Resource\ResourceInterface>> $resourcesByEnumClass */
-    $resourcesByEnumClass = [];
-    foreach ($pintoMapping->getResources() as $resource) {
-      // Only full components.
-      if ($resource->getClass() === NULL) {
-        continue;
-      }
-
-      if (!$resource instanceof ObjectListEnumResource) {
-        // @todo need to fix this if we want to support Standalone components.
-        continue;
-      }
-
-      $resourcesByEnumClass[$resource->pintoEnum::class][] = $resource;
-    }
-
-    foreach ($resourcesByEnumClass as $enumClass => $resources) {
+    foreach ($pintoMapping->getEnumClasses() as $enumClass) {
       if ($filterByEnumClasses !== [] && !\in_array($enumClass, $filterByEnumClasses, TRUE)) {
         continue;
       }
 
-      foreach ($resources as $resource) {
-        $rClass = new \ReflectionClass($resource->getClass() ?? throw new \LogicException('Impossible, checked above.'));
+      foreach ($enumClass::cases() as $case) {
+        $r = new \ReflectionEnumUnitCase($case::class, $case->name);
+
+        /** @var array<\ReflectionAttribute<\Pinto\Attribute\Definition>> $attributes */
+        $attributes = $r->getAttributes(Definition::class);
+        $definition = ($attributes[0] ?? NULL)?->newInstance();
+        if ($definition === NULL) {
+          continue;
+        }
+
+        $rClass = new \ReflectionClass($definition->className);
 
         // Look for scenarios on the object class:
-        yield from static::findScenariosOnClass($rClass, $resource, allMethods: FALSE);
+        yield from static::findScenariosOnClass($rClass, $case, allMethods: FALSE);
 
         // Look for scenarios on classes referenced by #[Scenarios] above the
         // class.
@@ -72,7 +65,7 @@ final class Scenarios {
           foreach ($scenarios->scenarios as $className) {
             // When a scenarios class is used, all public static methods are
             // used regardless of whether they have a Scenario attribute.
-            yield from static::findScenariosOnClass(new \ReflectionClass($className), $resource, allMethods: TRUE);
+            yield from static::findScenariosOnClass(new \ReflectionClass($className), $case, allMethods: TRUE);
           }
         }
       }
@@ -82,7 +75,7 @@ final class Scenarios {
   /**
    * @phpstan-return \Generator<\PreviousNext\IdsTools\Scenario\CompiledScenario, \PreviousNext\IdsTools\Scenario\ScenarioSubject>
    */
-  private static function findScenariosOnClass(\ReflectionClass $rClass, ResourceInterface $resource, bool $allMethods): \Generator {
+  private static function findScenariosOnClass(\ReflectionClass $rClass, ObjectListInterface $case, bool $allMethods): \Generator {
     foreach ($rClass->getMethods(\ReflectionMethod::IS_STATIC) as $rMethod) {
       if (FALSE === $rMethod->isPublic()) {
         // Cant use bitwise filter so need this check.
@@ -99,13 +92,6 @@ final class Scenarios {
           $scenario = new Scenario();
         }
       }
-
-      if (!$resource instanceof ObjectListEnumResource) {
-        // @todo need to fix this if we want to support Standalone components.
-        throw new \LogicException('Checked above.');
-      }
-
-      $case = $resource->pintoEnum;
 
       // Recreate the Scenario.
       $compiledScenario = new CompiledScenario(
