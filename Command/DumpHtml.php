@@ -271,6 +271,11 @@ final class DumpHtml extends Command {
     $io->writeln('Dumping CSS and JS...');
     $i = 0;
     foreach ($css as $absoluteFileName => $definition) {
+      if (\str_starts_with($absoluteFileName, '//')) {
+        $cssPaths[] = ['href' => $absoluteFileName];
+        continue;
+      }
+
       $i++;
       $assetPath = \sprintf('/css/%s-%s', $i, \basename($absoluteFileName));
       if (isset($definition['attributes'])) {
@@ -282,6 +287,11 @@ final class DumpHtml extends Command {
     }
     $i = 0;
     foreach ($js as $absoluteFileName => $definition) {
+      if (\str_starts_with($absoluteFileName, '//')) {
+        $jsPaths[] = ['href' => $absoluteFileName];
+        continue;
+      }
+
       $i++;
       $assetPath = \sprintf('/js/%s-%s', $i, \basename($absoluteFileName));
       if (isset($definition['attributes'])) {
