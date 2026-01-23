@@ -42,6 +42,9 @@ final class ModifierBagDiscoveryTest extends TestCase {
         Common\Atom\Button\ButtonLayout::class,
         Common\Atom\Button\ButtonStyle::class,
       ],
+      Mixtape\Atom\Heading\Heading::class => [
+        Mixtape\Atom\Heading\HeadingVisualSize::class,
+      ],
       Mixtape\Atom\Icon\Icon::class => [
         Mixtape\Atom\Icon\IconSize::class,
         Mixtape\Atom\Icon\Icons::class,

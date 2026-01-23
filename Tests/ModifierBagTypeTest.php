@@ -32,12 +32,13 @@ final class ModifierBagTypeTest extends TestCase {
       }
     }
 
-    static::assertEqualsCanonicalizing($expectedModifiers, $actualModifiers);
+    static::assertEquals($expectedModifiers, $actualModifiers);
   }
 
   public static function containers(): \Generator {
     $commonModifiers = [
       Common\Atom\Button\Button::class . '$modifiers' => Common\Atom\Button\ButtonModifierInterface::class,
+      Common\Atom\Heading\Heading::class . '$modifiers' => Common\Atom\Heading\HeadingModifierInterface::class,
       Common\Atom\Icon\Icon::class . '$modifiers' => Common\Atom\Icon\IconModifierInterface::class,
       Common\Component\Card\Card::class . '$modifiers' => Common\Component\Card\CardModifierInterface::class,
       Common\Component\HeroBanner\HeroBanner::class . '$modifiers' => Common\Component\HeroBanner\HeroBannerModifierInterface::class,
@@ -56,6 +57,7 @@ final class ModifierBagTypeTest extends TestCase {
 
     $mixtapeModifiers = [
       Mixtape\Atom\Button\Button::class . '$modifiers' => Common\Atom\Button\ButtonModifierInterface::class,
+      Mixtape\Atom\Heading\Heading::class . '$modifiers' => Common\Atom\Heading\HeadingModifierInterface::class,
       Mixtape\Atom\Icon\Icon::class . '$modifiers' => Common\Atom\Icon\IconModifierInterface::class,
       Mixtape\Component\Card\Card::class . '$modifiers' => Common\Component\Card\CardModifierInterface::class,
       Mixtape\Component\HeroBanner\HeroBanner::class . '$modifiers' => Common\Component\HeroBanner\HeroBannerModifierInterface::class,
