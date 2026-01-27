@@ -131,7 +131,7 @@ final class CollectionGenericsTest extends TestCase {
   public static function offsetSetData(): \Generator {
     $commonCollectionAppends = [
       Common\Atom\Html\Html::class => 'mixed',
-      Common\Component\Accordion\Accordion::class => Common\Component\Accordion\AccordionItem\AccordionItem::class,
+      Common\Component\Accordion\Accordion::class => 'mixed',
       Common\Component\Breadcrumb\Breadcrumb::class => Common\Atom\Link\Link::class,
       Common\Component\LinkList\LinkList::class => Common\Atom\Link\Link::class,
       Common\Component\Navigation\Navigation::class => Common\Vo\MenuTree\MenuTree::class,
@@ -147,7 +147,7 @@ final class CollectionGenericsTest extends TestCase {
       Common\Layout\Sidebar\Sidebar::class => 'mixed',
     ];
     $mixtapeCollectionAppends = $commonCollectionAppends + [
-      Mixtape\Component\Accordion\Accordion::class => Common\Component\Accordion\AccordionItem\AccordionItem::class,
+      Mixtape\Component\Accordion\Accordion::class => 'mixed',
       Mixtape\Component\Breadcrumb\Breadcrumb::class => Common\Atom\Link\Link::class,
       Mixtape\Component\LinkList\LinkList::class => Common\Atom\Link\Link::class,
       Mixtape\Component\Navigation\Navigation::class => Common\Vo\MenuTree\MenuTree::class,
@@ -163,7 +163,7 @@ final class CollectionGenericsTest extends TestCase {
       Mixtape\Layout\Sidebar\Sidebar::class => 'mixed',
     ];
     $nswCollectionAppends = $commonCollectionAppends + [
-      Nsw\Component\Accordion\Accordion::class => Common\Component\Accordion\AccordionItem\AccordionItem::class,
+      Nsw\Component\Accordion\Accordion::class => 'mixed',
       Nsw\Component\Navigation\Navigation::class => Common\Vo\MenuTree\MenuTree::class,
       Nsw\Component\SocialLinks\SocialLinks::class => \sprintf("%s|%s|%s", Common\Component\SocialLinks\SocialLink\SocialLink::class, Common\Atom\LinkedImage\LinkedImage::class, Common\Atom\Link\Link::class),
       Nsw\Layout\Grid\Grid::class => 'mixed',
