@@ -124,6 +124,7 @@ final class ModifierBagDiscoveryTest extends TestCase {
         Nsw\Layout\Masthead\MastheadBackground::class,
       ],
       Nsw\Layout\Section\Section::class => [
+        Nsw\Layout\Section\LinkPosition::class,
         Nsw\Layout\Section\SectionBackground::class,
       ],
     ];
