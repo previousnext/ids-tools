@@ -55,6 +55,9 @@ final class ModifierBagDiscoveryTest extends TestCase {
       Mixtape\Component\HeroBanner\HeroBanner::class => [
         Mixtape\Component\HeroBanner\HeroBannerBackground::class,
       ],
+      Mixtape\Component\HeroSearch\HeroSearch::class => [
+        Mixtape\Component\HeroSearch\HeroSearchBackground::class,
+      ],
       Mixtape\Component\InPageNavigation\InPageNavigation::class => [
         Common\Component\InPageNavigation\IncludeHeadingLevels::class,
       ],
