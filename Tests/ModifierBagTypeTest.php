@@ -92,6 +92,7 @@ final class ModifierBagTypeTest extends TestCase {
       Nsw\Layout\Masthead\Masthead::class . '$modifiers' => Common\Layout\Masthead\MastheadModifierInterface::class,
       Nsw\Layout\Section\Section::class . '$modifiers' => Common\Layout\Section\SectionModifierInterface::class,
       Nsw\Layout\Sidebar\Sidebar::class . '$modifiers' => Common\Layout\Sidebar\SidebarModifierInterface::class,
+      Nsw\Component\Steps\Steps::class . '$modifiers' => Common\Component\Steps\StepsModifierInterface::class,
     ];
 
     foreach (IdsContainer::testContainers() as $ds => $container) {

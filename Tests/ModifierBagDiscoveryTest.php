@@ -133,6 +133,10 @@ final class ModifierBagDiscoveryTest extends TestCase {
         Nsw\Layout\Section\LinkPosition::class,
         Nsw\Layout\Section\SectionBackground::class,
       ],
+      Nsw\Component\Steps\Steps::class => [
+        Nsw\Component\Steps\StepsBackground::class,
+        Nsw\Component\Steps\StepsSize::class,
+      ],
     ];
 
     foreach (IdsContainer::testContainers(beforeCompile: static function (ContainerBuilder $containerBuilder): void {
