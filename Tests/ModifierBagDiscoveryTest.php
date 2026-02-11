@@ -105,6 +105,9 @@ final class ModifierBagDiscoveryTest extends TestCase {
         Common\Atom\Button\ButtonLayout::class,
         Common\Atom\Button\ButtonStyle::class,
       ],
+      Nsw\Atom\Heading\Heading::class => [
+        Nsw\Atom\Heading\HeadingVisualSize::class,
+      ],
       Nsw\Atom\Icon\Icon::class => [
         Nsw\Atom\Icon\IconSize::class,
       ],
