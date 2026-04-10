@@ -79,10 +79,7 @@ final class CompiledScenario {
       return NULL;
     }
 
-    $commonSpacing = \min(\array_map(static function ($line) {
-      \preg_match('/^(\s*)/', $line, $matches);
-      return \strlen($matches[1]);
-    }, $codeLines));
+    $commonSpacing = \min(\array_map(static fn ($line) => \strlen($line) - \strlen(\ltrim($line)), $codeLines));
 
     // Remove spacing.
     $trimmedLines = \array_map(static fn ($line) => \substr($line, $commonSpacing), $lines);
