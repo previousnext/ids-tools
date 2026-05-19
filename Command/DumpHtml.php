@@ -173,7 +173,7 @@ final class DumpHtml extends Command {
     $isPassingSoFar = TRUE;
     foreach ($scenarios as $scenario) {
       $scenarioObject = $scenarios[$scenario];
-      $rEnum = new \ReflectionClass(($scenario->pintoEnum ?? throw new \LogicException())::class);
+      $rEnum = new \ReflectionClass($scenario->pintoEnum::class);
       $progress->setMessage(\sprintf('%s::%s [%s]', $rEnum->getShortName(), $scenario->pintoEnum->name, $scenario->id));
 
       $scenarioStopwatch = (string) $scenario;
@@ -251,7 +251,7 @@ final class DumpHtml extends Command {
     $screenshotDiskRoot = \Safe\realpath(__DIR__ . '/../../../output/screenshots');
     $snippetDiskRoot = \Safe\realpath(__DIR__ . '/../../../output/code-snippets');
 
-    $rEnum = new \ReflectionClass(($scenario->pintoEnum ?? throw new \LogicException())::class);
+    $rEnum = new \ReflectionClass($scenario->pintoEnum::class);
     $locationSuffix = \sprintf('/%s/%s/%s', $rEnum->getShortName(), $scenario->pintoEnum->name, $scenario->id);
     $dumpHtmlTo = $htmlDiskRoot . $locationSuffix;
     $dumpScreenshotsTo = $screenshotDiskRoot . $locationSuffix;

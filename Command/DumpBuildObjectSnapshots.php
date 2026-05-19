@@ -79,7 +79,7 @@ final class DumpBuildObjectSnapshots extends Command {
     $scenarios = [];
     foreach (Scenarios::findScenarios($this->pintoMapping, $this->primaryLists) as $scenario => $scenarioSubject) {
       $this->stopwatch->lap('object generation');
-      $pintoEnum = $scenario->pintoEnum ?? throw new \LogicException();
+      $pintoEnum = $scenario->pintoEnum;
       $definition = ((new \ReflectionEnumUnitCase($pintoEnum::class, $pintoEnum->name))->getAttributes(Definition::class)[0] ?? NULL)?->newInstance() ?? throw new \LogicException('Missing ' . Definition::class);
       $scenarios[] = [$scenario, $scenarioSubject, $definition->className];
     }
@@ -90,7 +90,8 @@ final class DumpBuildObjectSnapshots extends Command {
     $io->writeln('Writing snapshots');
 
     $fs = new Filesystem();
-    foreach ($scenarios as [$scenario, $scenarioSubject, $objectClassName]) {
+    foreach ($scenarios as $scenarioData) {
+      [$scenario, $scenarioSubject, $objectClassName] = $scenarioData;
       try {
         Id::resetGlobalState();
         $rendered = ($scenarioSubject->obj)();
@@ -109,7 +110,7 @@ final class DumpBuildObjectSnapshots extends Command {
         ]));
       }
 
-      $io->writeln(\sprintf("Writing %s to %s", $scenario->id ?? throw new \LogicException(), $fileName));
+      $io->writeln(\sprintf("Writing %s to %s", $scenario->id, $fileName));
     }
     $this->stopwatch->stop('snapshot write');
 
