@@ -46,6 +46,13 @@ use Twig\Markup;
 )]
 final class DumpHtml extends Command {
 
+  /**
+   * Empirically, reg-viz/reg-actions v3 reliably crashes diffing images
+   * above ~30 megapixels but not at ~13 megapixels; this sits comfortably
+   * below that crash point.
+   */
+  protected const VISREG_PIXEL_WARNING_THRESHOLD = 20_000_000;
+
   protected const IDE_LAUNCH = [
     'emacs' => 'emacs://open?url=file://%s&line=%s',
     'macvim' => 'mvim://open?url=file://%s&line=%s',
@@ -370,11 +377,26 @@ final class DumpHtml extends Command {
     $screenshotArea = $driver->findElement(WebDriverBy::id('pinto-ace-screenshot-area'));
     // Common reason for this failing is there is no data to screenshot, i.e, a bad template problem.
     try {
-      $screenshotArea->takeElementScreenshot(\sprintf('%s.png', $dumpScreenshotsTo));
+      $screenshotPath = \sprintf('%s.png', $dumpScreenshotsTo);
+      $screenshotArea->takeElementScreenshot($screenshotPath);
     }
     catch (WebDriverException $e) {
       $io->error('Failed to take screenshot for `' . $scenario . '`: ' . $e->getMessage());
       return FALSE;
+    }
+
+    // The reg-viz/reg-actions visual regression tool crashes when diffing images
+    // above roughly this many pixels, so flag oversized screenshots early rather
+    // than let them silently break CI later.
+    $dimensions = \getimagesize($screenshotPath);
+    if ($dimensions !== FALSE && ($dimensions[0] * $dimensions[1]) > self::VISREG_PIXEL_WARNING_THRESHOLD) {
+      $io->warning(\sprintf(
+        'Screenshot for `%s` is %dx%d (%s megapixels), which may crash visual regression tooling. Consider adjusting the scenario (e.g. viewport size or content) to reduce it.',
+        $scenario,
+        $dimensions[0],
+        $dimensions[1],
+        \number_format($dimensions[0] * $dimensions[1] / 1_000_000, 1),
+      ));
     }
 
     return TRUE;
